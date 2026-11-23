@@ -13,6 +13,7 @@
 | M5 工时切段 | 查看并复算工时切段 | `/api/m5_calculate` | `app/modules/m5_calculate/rules.py` | `tests/test_calculate.py` |
 | M6 薪资对账 | 查看并复算薪资对账 | `/api/m6_reconcile` | `app/modules/m6_reconcile/compare.py` | `tests/test_reconcile.py` |
 | M7 周期归档 | 查看并复算周期归档 | `/api/m7_archive` | `app/modules/m7_archive/export_out.py` | `tests/test_archive.py` |
+| M8 社保申报 | 裁决在途工资并形成可申报基数 | `/api/m8_declare`、`/api/m8_declare/plan`、`/api/declarations` | `app/modules/m8_declare/policy.py` | `tests/test_declare.py` |
 
 ## 陷阱登记
 
@@ -31,6 +32,11 @@
 | TRAP-26 | 旧版本复核 | 覆盖新结论 | 事务条件更新 | `app/store.py` | `tests/test_archive.py::test_stale_review` |
 | TRAP-23 | 休息与跨夜端点 | 重复或漏计 | 半开区间切片 | `app/modules/m4_segments/rules.py` | `tests/test_segments.py::test_break_removed` |
 | TRAP-19 | 假日与周末重叠 | 费率相加 | 假日优先 | `app/modules/m5_calculate/rules.py` | `tests/test_calculate.py::test_holiday_overrides_rest` |
+| TRAP-31 | 在途跨月加班 | 等全部闭合再报或按0计入 | 待核项排除并登记后续补报，确认后补报入账 | `app/modules/m8_declare/policy.py` | `tests/test_declare.py::test_supplement_after_late_confirmation` |
+| TRAP-32 | 规则变更后旧申报 | 继续沿用或覆盖 | 提交时同事务作废并重新核对 | `app/store.py` | `tests/test_declare.py::test_rule_change_voids_previous_filing` |
+| TRAP-33 | 同批重跑 | 重复申报 | 派生 filing_id 幂等 | `app/store.py` | `tests/test_declare.py::test_first_filing_and_rerun_idempotent` |
+| TRAP-34 | 生成中断 | 半写批次覆盖 | 单事务+revision留存+restore | `app/store.py` | `tests/test_declare.py::test_interrupted_regeneration_restores_previous_result` |
+| TRAP-35 | 屏幕与导出不符 | 两个来源两个数 | 同一申报计划，自检通过才可导出 | `app/modules/m8_declare/export_out.py` | `tests/test_declare.py::test_page_and_export_agree` |
 
 ## 对账规则
 

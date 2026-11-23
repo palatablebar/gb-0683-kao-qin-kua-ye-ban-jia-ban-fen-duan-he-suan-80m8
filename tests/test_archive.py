@@ -8,7 +8,8 @@ import pytest
 def test_export_rows(state):
     rows=list(csv.reader(io.StringIO(bundle(state).lstrip('\ufeff'))));assert rows[0][0]=='记录类型' and rows[1][0]=='运行清单'
 def test_export_quarantine(state):
-    assert bundle(state).count('隔离')==len(state['quarantine'])
+    lines=[l for l in bundle(state).splitlines() if l.startswith('隔离,')]
+    assert len(lines)==len(state['quarantine'])
 def test_checksum_stable(state):
     assert checksum(state)==state['archive']['sha256'] and len(checksum(state))==64
 def test_archive_ready(state):
